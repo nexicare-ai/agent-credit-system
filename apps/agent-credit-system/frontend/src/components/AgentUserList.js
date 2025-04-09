@@ -11,6 +11,8 @@ const AgentUserList = () => {
   const [totalUsers, setTotalUsers] = useState(0);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [isSearching, setIsSearching] = useState(false);
 
   // Form dialogs state
   const [openForm, setOpenForm] = useState(false);
@@ -36,13 +38,14 @@ const AgentUserList = () => {
   const loadUsers = async () => {
     setLoading(true);
     try {
-      const data = await fetchAgentUsers(page * rowsPerPage, rowsPerPage);
+      const data = await fetchAgentUsers(page * rowsPerPage, rowsPerPage, searchTerm);
       setUsers(data.users);
       setTotalUsers(data.total);
     } catch (error) {
       showNotification('Failed to load users', 'error');
     } finally {
       setLoading(false);
+      setIsSearching(false);
     }
   };
 
@@ -53,6 +56,25 @@ const AgentUserList = () => {
   const handleChangeRowsPerPage = (e) => {
     setRowsPerPage(parseInt(e.target.value, 10));
     setPage(0);
+  };
+
+  const handleSearch = (e) => {
+    e.preventDefault();
+    setPage(0);
+    setIsSearching(true);
+    loadUsers();
+  };
+
+  const handleSearchChange = (e) => {
+    setSearchTerm(e.target.value);
+  };
+
+  const handleClearSearch = () => {
+    setSearchTerm('');
+    setPage(0);
+    setIsSearching(true);
+    // Use setTimeout to ensure searchTerm is cleared before loadUsers is called
+    setTimeout(() => loadUsers(), 0);
   };
 
   // User form handlers
@@ -196,7 +218,64 @@ const AgentUserList = () => {
         </button>
       </div>
 
-      {loading ? (
+      {/* Search bar */}
+      <div className="mb-4">
+        <form onSubmit={handleSearch} className="flex gap-2">
+          <div className="relative flex-grow">
+            <input
+              type="text"
+              placeholder="Search by mobile, name, or email..."
+              value={searchTerm}
+              onChange={handleSearchChange}
+              className="w-full px-4 py-2 pl-10 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+            />
+            <div className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+            {searchTerm && (
+              <button
+                type="button"
+                onClick={handleClearSearch}
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                </svg>
+              </button>
+            )}
+          </div>
+          <button
+            type="submit"
+            className="px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+          >
+            Search
+          </button>
+        </form>
+      </div>
+
+      {/* Search result indicator */}
+      {searchTerm && !loading && !isSearching && (
+        <div className="mb-4 text-sm text-gray-600 flex items-center">
+          <span>
+            {totalUsers === 0
+              ? 'No results found for '
+              : `Found ${totalUsers} result${totalUsers !== 1 ? 's' : ''} for `}
+            <span className="font-semibold">{searchTerm}</span>
+          </span>
+          {totalUsers > 0 && (
+            <button
+              onClick={handleClearSearch}
+              className="ml-2 text-blue-600 hover:text-blue-800 underline"
+            >
+              Clear search
+            </button>
+          )}
+        </div>
+      )}
+
+      {loading || isSearching ? (
         <div className="flex justify-center py-10">
           <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
         </div>

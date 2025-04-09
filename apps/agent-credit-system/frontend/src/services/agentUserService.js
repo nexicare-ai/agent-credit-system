@@ -2,9 +2,18 @@ import api from './api';
 
 const API_URL = `/api/agents/users`;
 
-export const fetchAgentUsers = async (skip = 0, limit = 10) => {
+export const fetchAgentUsers = async (skip = 0, limit = 10, search = '') => {
   try {
-    const response = await api.get(`${API_URL}?skip=${skip}&limit=${limit}`);
+    const params = new URLSearchParams({
+      skip: skip.toString(),
+      limit: limit.toString()
+    });
+
+    if (search) {
+      params.append('search', search);
+    }
+
+    const response = await api.get(`${API_URL}?${params.toString()}`);
     return response.data;
   } catch (error) {
     console.error('Error fetching agent users:', error);

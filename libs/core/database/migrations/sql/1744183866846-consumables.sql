@@ -8,5 +8,3 @@ CREATE TABLE consumable (
 );
 
 CREATE INDEX idx_consumable_name ON consumable (name);
-
-

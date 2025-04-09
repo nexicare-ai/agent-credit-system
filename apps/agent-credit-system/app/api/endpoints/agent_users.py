@@ -70,14 +70,27 @@ async def get_agent_user(
 async def list_agent_users(
     skip: int = Query(0, ge=0),
     limit: int = Query(100, ge=1, le=100),
+    search: Optional[str] = Query(None, description="Search term for mobile, name, or email"),
     db: Session = Depends(get_nexi_db),
     _: dict = Depends(get_current_active_user)
 ):
     """
-    List all agent users with pagination
+    List all agent users with pagination and optional search
     """
-    users = AgentUser.get_all_users(db, skip=skip, limit=limit)
-    total = db.query(AgentUser).count()
+    if search:
+        # Search in mobile, name, or email
+        like_search = f"%{search}%"
+        query = db.query(AgentUser).filter(
+            (AgentUser.mobile.ilike(like_search)) |
+            (AgentUser.name.ilike(like_search)) |
+            (AgentUser.email.ilike(like_search))
+        ).order_by(AgentUser.credit.desc())
+        users = query.offset(skip).limit(limit).all()
+        total = query.count()
+    else:
+        users = AgentUser.get_all_users(db, skip=skip, limit=limit)
+        total = db.query(AgentUser).count()
+
     return {"users": users, "total": total}
 
 @router.put("/users/{mobile}", response_model=AgentUserResponse)
