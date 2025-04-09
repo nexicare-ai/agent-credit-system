@@ -12,9 +12,9 @@ class ConsumableBase(BaseModel):
 class ConsumableCreate(ConsumableBase):
     pass
 
-class ConsumableUpdate(BaseModel):
+class ConsumableUpdate(ConsumableBase):
     name: Optional[str] = None
-    cost: Optional[Decimal] = Field(None, gt=0)
+    cost: Optional[Decimal] = None
     meta_data: Optional[Dict[str, Any]] = None
 
 class ConsumableResponse(ConsumableBase):
@@ -28,3 +28,8 @@ class ConsumableResponse(ConsumableBase):
 class ConsumablesList(BaseModel):
     consumables: List[ConsumableResponse]
     total: int
+
+# Apply Consumable Models
+class ApplyConsumableRequest(BaseModel):
+    user_id: str
+    description: Optional[str] = ""

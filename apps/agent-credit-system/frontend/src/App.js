@@ -9,6 +9,7 @@ import Dashboard from './pages/Dashboard';
 import AgentUserManagement from './pages/AgentUserManagement';
 import SystemEvents from './pages/SystemEvents';
 import Consumables from './pages/Consumables';
+import Purchasables from './pages/Purchasables';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -38,6 +39,7 @@ function App() {
           <Route path="/agents" element={<Layout><AgentUserManagement /></Layout>} />
           <Route path="/system/events" element={<Layout><SystemEvents /></Layout>} />
           <Route path="/consumables" element={<Layout><Consumables /></Layout>} />
+          <Route path="/purchasables" element={<Layout><Purchasables /></Layout>} />
         </Route>
 
         {/* Fallback route - redirect to login if not authenticated */}

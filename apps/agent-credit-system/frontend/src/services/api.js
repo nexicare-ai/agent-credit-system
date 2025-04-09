@@ -771,6 +771,143 @@ export const consumableService = {
       console.error(`Error deleting consumable ${consumableId}:`, error);
       throw error;
     }
+  },
+
+  // Apply a consumable to a user (update user's credit)
+  applyConsumable: async (consumableId, userId, description = '') => {
+    try {
+      const response = await api.post(`/api/consumables/${consumableId}/apply`, {
+        user_id: userId,
+        description
+      });
+      return response.data;
+    } catch (error) {
+      console.error(`Error applying consumable ${consumableId} to user ${userId}:`, error);
+      throw error;
+    }
+  }
+};
+
+// API functions for purchasables
+export const purchasableService = {
+  // Get all purchasables with pagination
+  getPurchasables: async (page = 1, limit = 10) => {
+    try {
+      const response = await api.get('/api/purchasables', {
+        params: {
+          skip: (page - 1) * limit,
+          limit
+        }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching purchasables:', error);
+      throw error;
+    }
+  },
+
+  // Create a new purchasable
+  createPurchasable: async (purchasableData) => {
+    try {
+      const response = await api.post('/api/purchasables', purchasableData);
+      return response.data;
+    } catch (error) {
+      console.error('Error creating purchasable:', error);
+      throw error;
+    }
+  },
+
+  // Get a specific purchasable
+  getPurchasable: async (purchasableId) => {
+    try {
+      const response = await api.get(`/api/purchasables/${purchasableId}`);
+      return response.data;
+    } catch (error) {
+      console.error(`Error fetching purchasable ${purchasableId}:`, error);
+      throw error;
+    }
+  },
+
+  // Update a purchasable
+  updatePurchasable: async (purchasableId, purchasableData) => {
+    try {
+      const response = await api.put(`/api/purchasables/${purchasableId}`, purchasableData);
+      return response.data;
+    } catch (error) {
+      console.error(`Error updating purchasable ${purchasableId}:`, error);
+      throw error;
+    }
+  },
+
+  // Delete a purchasable
+  deletePurchasable: async (purchasableId) => {
+    try {
+      await api.delete(`/api/purchasables/${purchasableId}`);
+      return true;
+    } catch (error) {
+      console.error(`Error deleting purchasable ${purchasableId}:`, error);
+      throw error;
+    }
+  },
+
+  // Apply a purchasable to a user (add to user's credit)
+  applyPurchasable: async (purchasableId, userId, description = '') => {
+    try {
+      const response = await api.post(`/api/purchasables/${purchasableId}/apply`, {
+        user_id: userId,
+        description
+      });
+      return response.data;
+    } catch (error) {
+      console.error(`Error applying purchasable ${purchasableId} to user ${userId}:`, error);
+      throw error;
+    }
+  }
+};
+
+// API functions for agent users
+export const agentUserService = {
+  // Search for agent users
+  searchAgentUsers: async (search = '', page = 1, limit = 10) => {
+    try {
+      const response = await api.get('/api/agents/users', {
+        params: {
+          search,
+          skip: (page - 1) * limit,
+          limit
+        }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error searching agent users:', error);
+      throw error;
+    }
+  },
+
+  // Get an agent user by ID
+  getAgentUserById: async (userId) => {
+    try {
+      const response = await api.get(`/api/agents/users/id/${userId}`);
+      return response.data;
+    } catch (error) {
+      console.error(`Error fetching agent user ${userId}:`, error);
+      throw error;
+    }
+  },
+
+  // Update an agent user's credit
+  updateAgentCredit: async (mobile, amount, description = '') => {
+    try {
+      const response = await api.post(`/api/agents/users/${mobile}/credit`, {
+        amount,
+        description,
+        event_type: 'agent_credit'
+      });
+      return response.data;
+    } catch (error) {
+      console.error(`Error updating credit for user with mobile ${mobile}:`, error);
+      throw error;
+    }
   }
 };
 

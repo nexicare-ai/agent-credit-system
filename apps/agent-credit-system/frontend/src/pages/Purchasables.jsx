@@ -1,30 +1,30 @@
 import React, { useState, useEffect } from 'react';
-import { consumableService } from '../services/api';
-import ConsumableForm from '../components/ConsumableForm';
-import ApplyConsumableForm from '../components/ApplyConsumableForm';
+import { purchasableService } from '../services/api';
+import PurchasableForm from '../components/PurchasableForm';
+import ApplyPurchasableForm from '../components/ApplyPurchasableForm';
 import { format } from 'date-fns';
 
-const Consumables = () => {
-  const [consumables, setConsumables] = useState([]);
+const Purchasables = () => {
+  const [purchasables, setPurchasables] = useState([]);
   const [total, setTotal] = useState(0);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isApplyFormOpen, setIsApplyFormOpen] = useState(false);
-  const [selectedConsumable, setSelectedConsumable] = useState(null);
+  const [selectedPurchasable, setSelectedPurchasable] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
 
-  const fetchConsumables = async () => {
+  const fetchPurchasables = async () => {
     try {
       setLoading(true);
-      const response = await consumableService.getConsumables(currentPage, pageSize);
-      setConsumables(response.consumables);
+      const response = await purchasableService.getPurchasables(currentPage, pageSize);
+      setPurchasables(response.purchasables);
       setTotal(response.total);
       setError(null);
     } catch (err) {
-      setError('Failed to fetch consumables');
+      setError('Failed to fetch purchasables');
       console.error(err);
     } finally {
       setLoading(false);
@@ -32,7 +32,7 @@ const Consumables = () => {
   };
 
   useEffect(() => {
-    fetchConsumables();
+    fetchPurchasables();
   }, [currentPage, pageSize]);
 
   // Clear success message after 3 seconds
@@ -47,61 +47,61 @@ const Consumables = () => {
 
   const handleCreate = async (data) => {
     try {
-      await consumableService.createConsumable(data);
+      await purchasableService.createPurchasable(data);
       setIsFormOpen(false);
-      fetchConsumables();
-      setSuccessMessage('Consumable created successfully');
+      fetchPurchasables();
+      setSuccessMessage('Purchasable created successfully');
     } catch (err) {
-      console.error('Failed to create consumable:', err);
-      setError('Failed to create consumable');
+      console.error('Failed to create purchasable:', err);
+      setError('Failed to create purchasable');
     }
   };
 
   const handleUpdate = async (data) => {
     try {
-      await consumableService.updateConsumable(selectedConsumable.id, data);
+      await purchasableService.updatePurchasable(selectedPurchasable.id, data);
       setIsFormOpen(false);
-      setSelectedConsumable(null);
-      fetchConsumables();
-      setSuccessMessage('Consumable updated successfully');
+      setSelectedPurchasable(null);
+      fetchPurchasables();
+      setSuccessMessage('Purchasable updated successfully');
     } catch (err) {
-      console.error('Failed to update consumable:', err);
-      setError('Failed to update consumable');
+      console.error('Failed to update purchasable:', err);
+      setError('Failed to update purchasable');
     }
   };
 
   const handleDelete = async (id) => {
-    if (window.confirm('Are you sure you want to delete this consumable?')) {
+    if (window.confirm('Are you sure you want to delete this purchasable?')) {
       try {
-        await consumableService.deleteConsumable(id);
-        fetchConsumables();
-        setSuccessMessage('Consumable deleted successfully');
+        await purchasableService.deletePurchasable(id);
+        fetchPurchasables();
+        setSuccessMessage('Purchasable deleted successfully');
       } catch (err) {
-        console.error('Failed to delete consumable:', err);
-        setError('Failed to delete consumable');
+        console.error('Failed to delete purchasable:', err);
+        setError('Failed to delete purchasable');
       }
     }
   };
 
-  const handleEdit = (consumable) => {
-    setSelectedConsumable(consumable);
+  const handleEdit = (purchasable) => {
+    setSelectedPurchasable(purchasable);
     setIsFormOpen(true);
   };
 
-  const handleApply = (consumable) => {
-    setSelectedConsumable(consumable);
+  const handleApply = (purchasable) => {
+    setSelectedPurchasable(purchasable);
     setIsApplyFormOpen(true);
   };
 
   const handleApplySubmit = async (data) => {
     try {
-      await consumableService.applyConsumable(data.consumableId, data.userId, data.description);
+      await purchasableService.applyPurchasable(data.purchasableId, data.userId, data.description);
       setIsApplyFormOpen(false);
-      setSelectedConsumable(null);
-      setSuccessMessage('Consumable applied successfully');
+      setSelectedPurchasable(null);
+      setSuccessMessage('Purchasable applied successfully');
     } catch (err) {
-      console.error('Failed to apply consumable:', err);
-      setError('Failed to apply consumable');
+      console.error('Failed to apply purchasable:', err);
+      setError('Failed to apply purchasable');
     }
   };
 
@@ -110,15 +110,15 @@ const Consumables = () => {
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Consumables</h1>
+        <h1 className="text-2xl font-bold text-gray-800">Purchasables</h1>
         <button
           onClick={() => {
-            setSelectedConsumable(null);
+            setSelectedPurchasable(null);
             setIsFormOpen(true);
           }}
           className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
         >
-          Add Consumable
+          Add Purchasable
         </button>
       </div>
 
@@ -148,13 +148,13 @@ const Consumables = () => {
                     Name
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Cost
+                    Price
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Credit Amount
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Created At
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Updated At
                   </th>
                   <th className="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Actions
@@ -162,39 +162,37 @@ const Consumables = () => {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
-                {consumables.map((consumable) => (
-                  <tr key={consumable.id}>
+                {purchasables.map((purchasable) => (
+                  <tr key={purchasable.id}>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm font-medium text-gray-900">{consumable.name}</div>
+                      <div className="text-sm font-medium text-gray-900">{purchasable.name}</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-900">{consumable.cost} credits</div>
+                      <div className="text-sm text-gray-900">{purchasable.price}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-green-600">+{purchasable.credit_amount} credits</div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-500">
-                        {format(new Date(consumable.created_at), 'PPpp')}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm text-gray-500">
-                        {format(new Date(consumable.updated_at), 'PPpp')}
+                        {format(new Date(purchasable.created_at), 'PPpp')}
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <button
-                        onClick={() => handleApply(consumable)}
+                        onClick={() => handleApply(purchasable)}
                         className="text-green-600 hover:text-green-900 mr-4"
                       >
                         Apply
                       </button>
                       <button
-                        onClick={() => handleEdit(consumable)}
+                        onClick={() => handleEdit(purchasable)}
                         className="text-blue-600 hover:text-blue-900 mr-4"
                       >
                         Edit
                       </button>
                       <button
-                        onClick={() => handleDelete(consumable.id)}
+                        onClick={() => handleDelete(purchasable.id)}
                         className="text-red-600 hover:text-red-900"
                       >
                         Delete
@@ -210,7 +208,7 @@ const Consumables = () => {
           <div className="mt-4 flex items-center justify-between">
             <div className="flex items-center">
               <span className="text-sm text-gray-700">
-                Showing {consumables.length} of {total} items
+                Showing {purchasables.length} of {total} items
               </span>
             </div>
             <div className="flex items-center space-x-2">
@@ -236,27 +234,27 @@ const Consumables = () => {
         </>
       )}
 
-      <ConsumableForm
+      <PurchasableForm
         open={isFormOpen}
         onClose={() => {
           setIsFormOpen(false);
-          setSelectedConsumable(null);
+          setSelectedPurchasable(null);
         }}
-        consumable={selectedConsumable}
-        onSubmit={selectedConsumable ? handleUpdate : handleCreate}
+        purchasable={selectedPurchasable}
+        onSubmit={selectedPurchasable ? handleUpdate : handleCreate}
       />
 
-      <ApplyConsumableForm
+      <ApplyPurchasableForm
         open={isApplyFormOpen}
         onClose={() => {
           setIsApplyFormOpen(false);
-          setSelectedConsumable(null);
+          setSelectedPurchasable(null);
         }}
-        consumable={selectedConsumable}
+        purchasable={selectedPurchasable}
         onApply={handleApplySubmit}
       />
     </div>
   );
 };
 
-export default Consumables;
+export default Purchasables;
