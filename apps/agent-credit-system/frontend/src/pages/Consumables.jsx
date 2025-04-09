@@ -95,7 +95,12 @@ const Consumables = () => {
 
   const handleApplySubmit = async (data) => {
     try {
-      await consumableService.applyConsumable(data.consumableId, data.userId, data.description);
+      await consumableService.applyConsumable(
+        data.consumableId,
+        data.userId,
+        data.count,
+        data.description
+      );
       setIsApplyFormOpen(false);
       setSelectedConsumable(null);
       setSuccessMessage('Consumable applied successfully');
@@ -148,7 +153,7 @@ const Consumables = () => {
                     Name
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Cost
+                    Cost (per unit)
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Created At

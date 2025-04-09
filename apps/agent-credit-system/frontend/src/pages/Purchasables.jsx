@@ -95,7 +95,12 @@ const Purchasables = () => {
 
   const handleApplySubmit = async (data) => {
     try {
-      await purchasableService.applyPurchasable(data.purchasableId, data.userId, data.description);
+      await purchasableService.applyPurchasable(
+        data.purchasableId,
+        data.userId,
+        data.count,
+        data.description
+      );
       setIsApplyFormOpen(false);
       setSelectedPurchasable(null);
       setSuccessMessage('Purchasable applied successfully');
@@ -148,10 +153,10 @@ const Purchasables = () => {
                     Name
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Price
+                    Price (per unit)
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Credit Amount
+                    Credit Amount (per unit)
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Created At

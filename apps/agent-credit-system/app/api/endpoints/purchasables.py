@@ -142,8 +142,13 @@ async def apply_purchasable(
             detail="User not found"
         )
 
+    # Get the count (default is 1)
+    count = apply_data.count
+
     # Calculate the amount to add (positive amount since we're adding credits)
-    amount = purchasable.credit_amount
+    # Multiply by count to apply multiple purchasables
+    single_amount = purchasable.credit_amount
+    amount = single_amount * count
 
     # Get current credit balance
     previous_balance = user.credit
@@ -159,7 +164,7 @@ async def apply_purchasable(
     created_by = current_user.id if current_user else None
 
     # Create a description for the credit event if none provided
-    description = apply_data.description or f"Applied purchasable: {purchasable.name}"
+    description = apply_data.description or f"Applied {count} {purchasable.name}" + ("s" if count > 1 else "")
 
     # Create credit event for event sourcing
     event = AgentEvent.create_credit_event(
@@ -168,6 +173,8 @@ async def apply_purchasable(
         previous_balance=previous_balance,
         new_balance=new_balance,
         description=description,
+        purchasable_name=purchasable.name,
+        count=count,
         created_by=created_by,
         db=db
     )
@@ -183,7 +190,8 @@ async def apply_purchasable(
             "id": purchasable.id,
             "name": purchasable.name,
             "price": float(purchasable.price),
-            "credit_amount": float(purchasable.credit_amount)
+            "credit_amount": float(purchasable.credit_amount),
+            "count": count
         },
         "event": {
             "id": event.id,

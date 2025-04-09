@@ -34,4 +34,5 @@ class PurchasablesList(BaseModel):
 # Apply Purchasable Models
 class ApplyPurchasableRequest(BaseModel):
     user_id: str
+    count: int = Field(default=1, ge=1, description="Number of purchasables to apply")
     description: Optional[str] = ""

@@ -774,10 +774,11 @@ export const consumableService = {
   },
 
   // Apply a consumable to a user (update user's credit)
-  applyConsumable: async (consumableId, userId, description = '') => {
+  applyConsumable: async (consumableId, userId, count = 1, description = '') => {
     try {
       const response = await api.post(`/api/consumables/${consumableId}/apply`, {
         user_id: userId,
+        count: count,
         description
       });
       return response.data;
@@ -851,10 +852,11 @@ export const purchasableService = {
   },
 
   // Apply a purchasable to a user (add to user's credit)
-  applyPurchasable: async (purchasableId, userId, description = '') => {
+  applyPurchasable: async (purchasableId, userId, count = 1, description = '') => {
     try {
       const response = await api.post(`/api/purchasables/${purchasableId}/apply`, {
         user_id: userId,
+        count: count,
         description
       });
       return response.data;

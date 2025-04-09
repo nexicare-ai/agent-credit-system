@@ -27,13 +27,20 @@ class AgentEvent(Base):
         self.created_by = created_by
 
     @staticmethod
-    def create_credit_event(target_id, amount, previous_balance, new_balance, description=None, created_by=None, db=None):
+    def create_credit_event(target_id, amount, previous_balance, new_balance, consumable_name=None, count=None, purchasable_name=None, description=None, created_by=None, db=None):
         """Create a credit related event for an agent user"""
         event_data = {
             "amount": str(amount),
             "previous_balance": str(previous_balance),
-            "new_balance": str(new_balance)
+            "new_balance": str(new_balance),
         }
+
+        if consumable_name:
+            event_data["consumable_name"] = consumable_name
+        if purchasable_name:
+            event_data["purchasable_name"] = purchasable_name
+        if count:
+            event_data["count"] = count
 
         event = AgentEvent(
             event_type="agent_credit",

@@ -140,8 +140,13 @@ async def apply_consumable(
             detail="User not found"
         )
 
+    # Get the count (default is 1)
+    count = apply_data.count
+
     # Calculate the amount to deduct (negative amount since we're deducting credits)
-    amount = Decimal('-' + str(consumable.cost))
+    # Multiply by count to apply multiple consumables
+    single_amount = Decimal('-' + str(consumable.cost))
+    amount = single_amount * count
 
     # Get current credit balance
     previous_balance = user.credit
@@ -149,7 +154,7 @@ async def apply_consumable(
     # Calculate new balance
     new_balance = previous_balance + amount
 
-    # # Check if the user has enough credit
+    # Check if the user has enough credit
     # if new_balance < 0:
     #     raise HTTPException(
     #         status_code=status.HTTP_400_BAD_REQUEST,
@@ -164,7 +169,7 @@ async def apply_consumable(
     created_by = current_user.id if current_user else None
 
     # Create a description for the credit event if none provided
-    description = apply_data.description or f"Applied consumable: {consumable.name}"
+    description = apply_data.description or f"Applied {count} {consumable.name}" + ("s" if count > 1 else "")
 
     # Create credit event for event sourcing
     event = AgentEvent.create_credit_event(
@@ -172,6 +177,8 @@ async def apply_consumable(
         amount=amount,
         previous_balance=previous_balance,
         new_balance=new_balance,
+        consumable_name=consumable.name,
+        count=count,
         description=description,
         created_by=created_by,
         db=db
@@ -187,7 +194,8 @@ async def apply_consumable(
         "consumable": {
             "id": consumable.id,
             "name": consumable.name,
-            "cost": float(consumable.cost)
+            "cost": float(consumable.cost),
+            "count": count
         },
         "event": {
             "id": event.id,

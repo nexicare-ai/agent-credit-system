@@ -3,12 +3,14 @@ import UserSearchDialog from './UserSearchDialog';
 
 const ApplyPurchasableForm = ({ open, onClose, purchasable, onApply }) => {
   const [selectedUser, setSelectedUser] = useState(null);
+  const [count, setCount] = useState(1);
   const [description, setDescription] = useState('');
   const [error, setError] = useState(null);
   const [isSearchDialogOpen, setIsSearchDialogOpen] = useState(false);
 
   const resetForm = () => {
     setSelectedUser(null);
+    setCount(1);
     setDescription('');
     setError(null);
   };
@@ -21,11 +23,22 @@ const ApplyPurchasableForm = ({ open, onClose, purchasable, onApply }) => {
   }, [open, purchasable]);
 
   const validateForm = () => {
+    const newErrors = {};
+
     if (!selectedUser) {
-      setError('Please select a user');
+      newErrors.user = 'Please select a user';
+    }
+
+    if (!count || count < 1) {
+      newErrors.count = 'Count must be at least 1';
+    }
+
+    if (Object.keys(newErrors).length > 0) {
+      setError(newErrors);
       return false;
     }
 
+    setError(null);
     return true;
   };
 
@@ -36,6 +49,7 @@ const ApplyPurchasableForm = ({ open, onClose, purchasable, onApply }) => {
       onApply({
         userId: selectedUser.id,
         purchasableId: purchasable.id,
+        count: parseInt(count, 10),
         description
       });
     }
@@ -43,10 +57,19 @@ const ApplyPurchasableForm = ({ open, onClose, purchasable, onApply }) => {
 
   const handleSelectUser = (user) => {
     setSelectedUser(user);
-    setError(null);
+    setError(prev => prev && { ...prev, user: null });
+  };
+
+  const handleCountChange = (e) => {
+    const value = parseInt(e.target.value, 10);
+    setCount(value);
+    setError(prev => prev && { ...prev, count: null });
   };
 
   if (!open || !purchasable) return null;
+
+  const totalPrice = (parseFloat(purchasable.price) * count).toFixed(2);
+  const totalCredit = (parseFloat(purchasable.credit_amount) * count).toFixed(2);
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
@@ -64,6 +87,20 @@ const ApplyPurchasableForm = ({ open, onClose, purchasable, onApply }) => {
                 <div className="text-sm text-gray-500">Price: {purchasable.price}</div>
                 <div className="text-sm text-gray-500">Credits: +{purchasable.credit_amount}</div>
               </div>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Count</label>
+              <input
+                type="number"
+                min="1"
+                value={count}
+                onChange={handleCountChange}
+                className={`w-full px-3 py-2 border rounded-md shadow-sm focus:outline-none focus:ring-1 focus:ring-blue-500 ${error?.count ? 'border-red-500' : 'border-gray-300'}`}
+              />
+              {error?.count && <p className="mt-1 text-sm text-red-600">{error.count}</p>}
+              <p className="mt-1 text-xs text-gray-500">Total price: {totalPrice}</p>
+              <p className="mt-1 text-xs text-gray-500">Total credits: +{totalCredit}</p>
             </div>
 
             <div>
@@ -90,12 +127,12 @@ const ApplyPurchasableForm = ({ open, onClose, purchasable, onApply }) => {
                 <button
                   type="button"
                   onClick={() => setIsSearchDialogOpen(true)}
-                  className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className={`w-full px-3 py-2 text-sm border rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500 ${error?.user ? 'border-red-500' : 'border-gray-300'}`}
                 >
                   Select User
                 </button>
               )}
-              {error && <p className="mt-1 text-sm text-red-600">{error}</p>}
+              {error?.user && <p className="mt-1 text-sm text-red-600">{error.user}</p>}
             </div>
 
             <div>
@@ -114,7 +151,7 @@ const ApplyPurchasableForm = ({ open, onClose, purchasable, onApply }) => {
                 <div className="text-sm text-green-700 flex justify-between items-center">
                   <span>User's credit after applying:</span>
                   <span className="font-bold">
-                    {(parseFloat(selectedUser.credit) + parseFloat(purchasable.credit_amount)).toFixed(2)} credits
+                    {(parseFloat(selectedUser.credit) + parseFloat(totalCredit)).toFixed(2)} credits
                   </span>
                 </div>
               </div>

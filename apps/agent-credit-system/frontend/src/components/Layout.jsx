@@ -39,7 +39,7 @@ const Layout = ({ children }) => {
           </div>
           <div className="flex items-center space-x-4 relative">
             {/* Environment Switcher */}
-            <EnvironmentSwitcher />
+            {/* <EnvironmentSwitcher /> */}
 
             <div className="relative">
               <button

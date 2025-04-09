@@ -32,4 +32,5 @@ class ConsumablesList(BaseModel):
 # Apply Consumable Models
 class ApplyConsumableRequest(BaseModel):
     user_id: str
+    count: int = Field(default=1, ge=1, description="Number of consumables to apply")
     description: Optional[str] = ""
