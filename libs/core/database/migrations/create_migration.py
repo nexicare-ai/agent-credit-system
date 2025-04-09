@@ -1,5 +1,6 @@
 import time
 import sys
+import os
 
 
 def migration_up():
@@ -9,10 +10,14 @@ def migration_up():
     #     sys.exit(1)
     migration_filename = f"{ int(time.time() * 1000)}-{migration_name}.sql"
 
-    with open(migration_filename, 'w') as f:
+    # Create migration file in the sql directory
+    migration_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'sql')
+    migration_path = os.path.join(migration_dir, migration_filename)
+
+    with open(migration_path, 'w') as f:
         f.write("")
 
-    print(f"Created migration file: {migration_filename}")
+    print(f"Created migration file: {migration_path}")
 
 if __name__ == '__main__':
     migration_up()

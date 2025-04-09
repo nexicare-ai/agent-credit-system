@@ -1,4 +1,6 @@
 from .admin_user import AdminUser
-from .cms_user import CMSUser
+from .agent_user import AgentUser
+from .agent_event import AgentEvent
+from .consumable import Consumable
 
-__all__ = ["AdminUser", "CMSUser"]
+__all__ = ["AdminUser", "AgentUser", "AgentEvent", "Consumable"]

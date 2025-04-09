@@ -699,4 +699,67 @@ export const analyticsService = {
   }
 };
 
+// API functions for consumables
+export const consumableService = {
+  // Get all consumables with pagination
+  getConsumables: async (page = 1, limit = 10) => {
+    try {
+      const response = await api.get('/api/consumables', {
+        params: {
+          skip: (page - 1) * limit,
+          limit
+        }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching consumables:', error);
+      throw error;
+    }
+  },
+
+  // Create a new consumable
+  createConsumable: async (consumableData) => {
+    try {
+      const response = await api.post('/api/consumables', consumableData);
+      return response.data;
+    } catch (error) {
+      console.error('Error creating consumable:', error);
+      throw error;
+    }
+  },
+
+  // Get a specific consumable
+  getConsumable: async (consumableId) => {
+    try {
+      const response = await api.get(`/api/consumables/${consumableId}`);
+      return response.data;
+    } catch (error) {
+      console.error(`Error fetching consumable ${consumableId}:`, error);
+      throw error;
+    }
+  },
+
+  // Update a consumable
+  updateConsumable: async (consumableId, consumableData) => {
+    try {
+      const response = await api.put(`/api/consumables/${consumableId}`, consumableData);
+      return response.data;
+    } catch (error) {
+      console.error(`Error updating consumable ${consumableId}:`, error);
+      throw error;
+    }
+  },
+
+  // Delete a consumable
+  deleteConsumable: async (consumableId) => {
+    try {
+      await api.delete(`/api/consumables/${consumableId}`);
+      return true;
+    } catch (error) {
+      console.error(`Error deleting consumable ${consumableId}:`, error);
+      throw error;
+    }
+  }
+};
+
 export default api;

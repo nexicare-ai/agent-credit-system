@@ -6,7 +6,9 @@ import Clinics from './pages/Clinics';
 import ClinicDetail from './pages/ClinicDetail';
 import Conversations from './pages/Conversations';
 import Dashboard from './pages/Dashboard';
-import CMSUserManagement from './pages/CMSUserManagement';
+import AgentUserManagement from './pages/AgentUserManagement';
+import SystemEvents from './pages/SystemEvents';
+import Consumables from './pages/Consumables';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -33,7 +35,9 @@ function App() {
           <Route path="/clinics" element={<Layout><Clinics /></Layout>} />
           <Route path="/clinics/:clinicId" element={<Layout><ClinicDetail /></Layout>} />
           <Route path="/clinics/:clinicId/conversations" element={<Layout><Conversations /></Layout>} />
-          <Route path="/cms/users" element={<Layout><CMSUserManagement /></Layout>} />
+          <Route path="/agents" element={<Layout><AgentUserManagement /></Layout>} />
+          <Route path="/system/events" element={<Layout><SystemEvents /></Layout>} />
+          <Route path="/consumables" element={<Layout><Consumables /></Layout>} />
         </Route>
 
         {/* Fallback route - redirect to login if not authenticated */}

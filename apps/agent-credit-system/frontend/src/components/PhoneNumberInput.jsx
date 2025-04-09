@@ -23,6 +23,7 @@ const PhoneNumberInput = ({
   onPhoneNumberChange,
   error,
   label = "Phone Number",
+  disabled = false
 }) => {
   // Handle country code change
   const handleCountryCodeChange = (e) => {
@@ -47,6 +48,7 @@ const PhoneNumberInput = ({
             value={countryCode}
             onChange={handleCountryCodeChange}
             className="w-full p-2 border rounded"
+            disabled={disabled}
           >
             {countryCodes.map((code) => (
               <option key={code.code} value={code.code}>
@@ -62,6 +64,7 @@ const PhoneNumberInput = ({
             onChange={handlePhoneNumberChange}
             className={`w-full p-2 border rounded ${error ? 'border-red-500' : ''}`}
             placeholder="Enter phone number (digits only)"
+            disabled={disabled}
           />
         </div>
       </div>
