@@ -110,6 +110,18 @@ export const authService = {
       throw error;
     }
   },
+
+  // Get user by ID
+  getUserById: async (userId) => {
+    if (!userId) return null;
+    try {
+      const response = await api.get(`/api/auth/user/${userId}`);
+      return response.data;
+    } catch (error) {
+      console.error(`Error getting user with ID ${userId}:`, error);
+      return { username: userId.substring(0, 8), id: userId };
+    }
+  },
 };
 
 // API functions for clinics

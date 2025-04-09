@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { fetchEvents, fetchEventTypes } from '../services/eventsService';
 import { fetchAgentUserById } from '../services/agentUserService';
+import { authService } from '../services/api';
 
 const EventsList = () => {
   const [events, setEvents] = useState([]);
@@ -12,6 +13,7 @@ const EventsList = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [eventTypes, setEventTypes] = useState([]);
   const [userCache, setUserCache] = useState({});
+  const [createdByUserCache, setCreatedByUserCache] = useState({});
 
   useEffect(() => {
     loadEvents();
@@ -37,6 +39,12 @@ const EventsList = () => {
       // Preload user information for events
       const targetIds = [...new Set(data.events.map(event => event.target_id))];
       await Promise.all(targetIds.map(loadUserInfo));
+
+      // Preload created_by user information
+      const createdByIds = [...new Set(data.events
+        .filter(event => event.created_by)
+        .map(event => event.created_by))];
+      await Promise.all(createdByIds.map(loadCreatedByUserInfo));
     } catch (error) {
       console.error('Failed to load events:', error);
     } finally {
@@ -60,6 +68,27 @@ const EventsList = () => {
       setUserCache(prev => ({
         ...prev,
         [userId]: { name: 'Unknown', mobile: 'N/A' }
+      }));
+    }
+  };
+
+  const loadCreatedByUserInfo = async (userId) => {
+    // Skip if already in cache
+    if (createdByUserCache[userId]) return;
+
+    try {
+      // Admin users are loaded by username instead of ID
+      const user = await authService.getCurrentUser();
+      setCreatedByUserCache(prev => ({
+        ...prev,
+        [userId]: { username: userId }  // Store the username directly
+      }));
+    } catch (error) {
+      console.error(`Failed to load created_by user info for ${userId}:`, error);
+      // Cache failed lookup to avoid repeated requests
+      setCreatedByUserCache(prev => ({
+        ...prev,
+        [userId]: { username: userId }
       }));
     }
   };
@@ -136,6 +165,12 @@ const EventsList = () => {
     };
   };
 
+  // Get created_by user information for display
+  const getCreatedByUserInfo = (userId) => {
+    if (!userId) return 'System';
+    return userId; // Display username directly
+  };
+
   // Calculate pagination
   const totalPages = Math.ceil(totalEvents / rowsPerPage);
   const showingFrom = totalEvents === 0 ? 0 : page * rowsPerPage + 1;
@@ -202,6 +237,9 @@ const EventsList = () => {
                     Agent
                   </th>
                   <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Created By
+                  </th>
+                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Details
                   </th>
                 </tr>
@@ -209,7 +247,7 @@ const EventsList = () => {
               <tbody className="bg-white divide-y divide-gray-200">
                 {events.length === 0 ? (
                   <tr>
-                    <td colSpan={4} className="px-6 py-4 text-center text-sm text-gray-500">
+                    <td colSpan={5} className="px-6 py-4 text-center text-sm text-gray-500">
                       No events found
                     </td>
                   </tr>
@@ -229,6 +267,14 @@ const EventsList = () => {
                         <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                           <div className="font-medium">{userInfo.display}</div>
                           <div className="text-xs text-gray-400">{userInfo.info}</div>
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-500">
+                          {event.created_by_username ?
+                            <span className="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded">
+                              {getCreatedByUserInfo(event.created_by_username)}
+                            </span> :
+                            <span className="text-gray-400">System</span>
+                          }
                         </td>
                         <td className="px-6 py-4 text-sm text-gray-500">
                           <details className="cursor-pointer">

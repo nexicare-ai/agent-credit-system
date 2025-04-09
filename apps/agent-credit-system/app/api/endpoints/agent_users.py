@@ -10,6 +10,7 @@ from app.models.agent_user import (
 )
 from app.dependencies.auth import get_current_active_user
 from libs.core.database import get_nexi_db
+from libs.core.entities.admin_user import AdminUser
 from libs.core.entities.agent_user import AgentUser
 from libs.core.entities.agent_event import AgentEvent
 
@@ -155,7 +156,7 @@ async def update_user_credit(
     mobile: str,
     credit_event: CreditEventCreate,
     db: Session = Depends(get_nexi_db),
-    _: dict = Depends(get_current_active_user)
+    current_user: AdminUser = Depends(get_current_active_user)
 ):
     """
     Update user credit with event sourcing
@@ -177,6 +178,9 @@ async def update_user_credit(
     user.credit = new_balance
     db.commit()
 
+    # Get current user ID for tracking who made the change
+    created_by = current_user.id if current_user else None
+
     # Create credit event for event sourcing
     event = AgentEvent.create_credit_event(
         target_id=user.id,
@@ -184,6 +188,7 @@ async def update_user_credit(
         previous_balance=previous_balance,
         new_balance=new_balance,
         description=credit_event.description,
+        created_by=created_by,
         db=db
     )
 

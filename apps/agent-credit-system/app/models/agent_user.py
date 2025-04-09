@@ -41,6 +41,8 @@ class EventResponse(EventBase):
     id: str
     target_id: str
     event_data: Dict[str, Any]
+    created_by: Optional[str] = None
+    created_by_username: Optional[str] = None
     timestamp: datetime
 
     class Config:

@@ -14,17 +14,20 @@ class AgentEvent(Base):
     target_id = Column(String, ForeignKey('agent_user.id', ondelete='CASCADE'), nullable=False)
     event_data = Column(JSONB, nullable=False)
     description = Column(Text)
+    created_by = Column(String, ForeignKey('admin_user.id', ondelete='SET NULL'), nullable=True)
+    created_by_username = Column(String, nullable=True, info={'readonly': True})
     timestamp = Column(DateTime, default=datetime.now)
 
-    def __init__(self, event_type, target_id, event_data, description=None, id=None):
+    def __init__(self, event_type, target_id, event_data, description=None, created_by=None, id=None):
         self.id = id or str(ulid.ulid())
         self.event_type = event_type
         self.target_id = target_id
         self.event_data = event_data
         self.description = description
+        self.created_by = created_by
 
     @staticmethod
-    def create_credit_event(target_id, amount, previous_balance, new_balance, description=None, db=None):
+    def create_credit_event(target_id, amount, previous_balance, new_balance, description=None, created_by=None, db=None):
         """Create a credit related event for an agent user"""
         event_data = {
             "amount": str(amount),
@@ -36,7 +39,8 @@ class AgentEvent(Base):
             event_type="agent_credit",
             target_id=target_id,
             event_data=event_data,
-            description=description
+            description=description,
+            created_by=created_by
         )
 
         if db:

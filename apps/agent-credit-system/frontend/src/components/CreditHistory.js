@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { fetchAgentCreditHistory } from '../services/agentUserService';
+import { authService } from '../services/api';
 
 const CreditHistory = ({ mobile, onClose }) => {
   const [events, setEvents] = useState([]);
@@ -7,6 +8,7 @@ const CreditHistory = ({ mobile, onClose }) => {
   const [totalEvents, setTotalEvents] = useState(0);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [userCache, setUserCache] = useState({});
 
   useEffect(() => {
     if (mobile) {
@@ -20,11 +22,45 @@ const CreditHistory = ({ mobile, onClose }) => {
       const data = await fetchAgentCreditHistory(mobile, page * rowsPerPage, rowsPerPage);
       setEvents(data.events);
       setTotalEvents(data.total);
+
+      // Get unique user IDs for fetching user info
+      const userIds = data.events
+        .filter(event => event.created_by)
+        .map(event => event.created_by)
+        .filter((id, index, self) => self.indexOf(id) === index);
+
+      // Fetch user info for each unique user ID not already in cache
+      const newUserCache = { ...userCache };
+      for (const userId of userIds) {
+        if (!userCache[userId]) {
+          try {
+            const userInfo = await authService.getUserById(userId);
+            if (userInfo) {
+              newUserCache[userId] = userInfo;
+            }
+          } catch (error) {
+            console.error(`Error fetching user info for ${userId}:`, error);
+          }
+        }
+      }
+
+      if (Object.keys(newUserCache).length > Object.keys(userCache).length) {
+        setUserCache(newUserCache);
+      }
     } catch (error) {
       console.error('Failed to load credit history:', error);
     } finally {
       setLoading(false);
     }
+  };
+
+  // Get user display name from cache
+  const getUserDisplay = (userId) => {
+    if (!userId) return "System";
+    if (userCache[userId]) {
+      return userCache[userId].username || userCache[userId].email || userId.substring(0, 8);
+    }
+    return userId.substring(0, 8);
   };
 
   const handleChangePage = (newPage) => {
@@ -94,12 +130,15 @@ const CreditHistory = ({ mobile, onClose }) => {
                     <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Description
                     </th>
+                    <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                      Created By
+                    </th>
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
                   {events.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="px-6 py-4 text-center text-sm text-gray-500">
+                      <td colSpan={6} className="px-6 py-4 text-center text-sm text-gray-500">
                         No credit events found
                       </td>
                     </tr>
@@ -120,6 +159,14 @@ const CreditHistory = ({ mobile, onClose }) => {
                         </td>
                         <td className="px-6 py-4 text-sm text-gray-500">
                           {event.description || '-'}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-500">
+                          {event.created_by_username ?
+                            <span className="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded">
+                              {getUserDisplay(event.created_by_username)}
+                            </span> :
+                            <span className="text-gray-400">System</span>
+                          }
                         </td>
                       </tr>
                     ))
