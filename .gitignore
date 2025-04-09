@@ -1,0 +1,16 @@
+.env
+__pycache__/
+*.pyc
+.git/
+jsons/mctb_clinic_settings.json
+jsons/session_ids_*.json
+production_settings/*
+staging_settings/*
+dev_notes.md
+*_clinic_knowledge.md
+conversation_history.db
+.DS_Store
+.tmp
+.env.*
+test_results*
+.nexi-venv/

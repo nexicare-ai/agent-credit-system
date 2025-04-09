@@ -1,0 +1,53 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: FastAPI (agent-credit-system)",
+            "type": "python",
+            "request": "launch",
+            "module": "uvicorn",
+            "args": [
+                "main:app",
+                "--reload",
+                "--reload-dir",
+                "${workspaceFolder}/apps/agent-credit-system",
+                "--reload-dir",
+                "${workspaceFolder}/libs",
+                "--host",
+                "0.0.0.0",
+                "--port",
+                "8100"
+            ],
+            "jinja": true,
+            "justMyCode": false,
+            "cwd": "${workspaceFolder}/apps/agent-credit-system",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        },
+        {
+            "name": "Python: Debug Tests",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "purpose": ["debug-test"],
+            "console": "integratedTerminal",
+            "justMyCode": false,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}"
+            }
+        }
+    ],
+    "compounds": [
+        {
+            "name": "Debug All Nexi Services",
+            "configurations": ["Python: FastAPI (agent-credit-system)"],
+            "stopAll": true,
+            "presentation": {
+                "hidden": false,
+                "group": "Nexi",
+                "order": 1
+            }
+        }
+    ]
+}

@@ -1,0 +1,44 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "set-debug-router",
+            "type": "shell",
+            "command": "echo 'Setting up to debug router'",
+            "windows": {
+                "command": "echo Setting up to debug router"
+            },
+            "options": {
+                "env": {
+                    "NEXI_DEBUG_SERVICE": "router"
+                }
+            }
+        },
+        {
+            "label": "set-debug-dashboard",
+            "type": "shell",
+            "command": "echo 'Setting up to debug dashboard'",
+            "windows": {
+                "command": "echo Setting up to debug dashboard"
+            },
+            "options": {
+                "env": {
+                    "NEXI_DEBUG_SERVICE": "dashboard"
+                }
+            }
+        },
+        {
+            "label": "set-debug-agent",
+            "type": "shell",
+            "command": "echo 'Setting up to debug agent'",
+            "windows": {
+                "command": "echo Setting up to debug agent"
+            },
+            "options": {
+                "env": {
+                    "NEXI_DEBUG_SERVICE": "agent"
+                }
+            }
+        }
+    ]
+}
