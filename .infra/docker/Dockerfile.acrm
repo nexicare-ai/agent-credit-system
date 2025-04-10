@@ -1,23 +1,39 @@
+FROM node:18-slim AS frontend-builder
+
+WORKDIR /app
+
+# Copy frontend code
+COPY apps/agent-credit-system/frontend/yarn.lock .
+COPY apps/agent-credit-system/frontend/package.json .
+
+# Install dependencies and build frontend
+RUN yarn install
+
+# Copy frontend code
+COPY apps/agent-credit-system/frontend .
+RUN yarn build
+
+# Copy requirements and install dependencies
+
 FROM python:3.11-slim
 
 WORKDIR /app
 
-# Copy requirements and install dependencies
 COPY apps/agent-credit-system/requirements.txt .
-RUN apt-get update && apt-get install -y libpq-dev gcc && \
-    pip install --no-cache-dir psycopg[binary] logfire 'logfire[psycopg2]' 'logfire[fastapi]' 'logfire[sqlalchemy]' && \
-    apt-get remove -y gcc && apt-get autoremove -y && rm -rf /var/lib/apt/lists/*
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
 COPY apps/agent-credit-system /app/
 COPY libs /app/libs/
 
+# Copy built frontend from the frontend-builder stage
+COPY --from=frontend-builder /app/build /app/frontend/build
+
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
 
 # Expose port
-EXPOSE 8030
+EXPOSE 8100
 
 # Run the application
 CMD ["python", "main.py"]

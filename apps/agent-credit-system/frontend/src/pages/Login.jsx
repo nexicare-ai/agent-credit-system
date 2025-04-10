@@ -22,16 +22,16 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!username || !password) {
       return;
     }
-    
+
     setIsSubmitting(true);
-    
+
     const success = await login(username, password);
     setIsSubmitting(false);
-    
+
     if (success) {
       navigate(from, { replace: true });
     }
@@ -45,23 +45,23 @@ const Login = () => {
             Sign in to your account
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            Access the Nexi Dashboard
+            Access the Agent CRM
           </p>
         </div>
-        
+
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
           {error && (
             <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
               <p className="text-red-700">{error}</p>
             </div>
           )}
-          
+
           {location.state?.message && (
             <div className="bg-green-50 border-l-4 border-green-500 p-4 mb-4">
               <p className="text-green-700">{location.state.message}</p>
             </div>
           )}
-          
+
           <div className="rounded-md shadow-sm -space-y-px">
             <div>
               <label htmlFor="username" className="sr-only">Username</label>
@@ -116,4 +116,4 @@ const Login = () => {
   );
 };
 
-export default Login; 
+export default Login;

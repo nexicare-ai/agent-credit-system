@@ -36,10 +36,10 @@ A FastAPI application that serves both a traditional server-rendered dashboard a
 ### Running the Server
 
 ```
-uvicorn main:app --reload --host 0.0.0.0 --port 8020
+uvicorn main:app --reload --host 0.0.0.0 --port 8100
 ```
 
-The application will be available at [http://localhost:8020](http://localhost:8020).
+The application will be available at [http://localhost:8100](http://localhost:8100).
 
 ## API Endpoints
 

@@ -40,7 +40,7 @@ A modern React SPA for the Nexi Dashboard, providing a user-friendly interface t
 Create a `.env` file in the project root with the following variables:
 
 ```
-REACT_APP_API_URL=http://localhost:8020
+REACT_APP_API_URL=http://localhost:8100
 ```
 
 Adjust the URL to match your backend API endpoint.
