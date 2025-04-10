@@ -21,6 +21,14 @@ class Consumable(Base):
         self.cost = cost
         self.meta_data = meta_data or {}
 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "name": self.name,
+            "cost": self.cost,
+            "meta_data": self.meta_data
+        }
+
     @staticmethod
     def find_by_id(id, db):
         return db.query(Consumable).filter(Consumable.id == id).first()

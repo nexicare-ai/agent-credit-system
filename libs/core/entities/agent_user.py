@@ -23,6 +23,16 @@ class AgentUser(Base):
         self.name = name
         self.credit = credit
 
+    def to_dict(self):
+        return {
+            "id": self.id,
+            "mobile": self.mobile,
+            "email": self.email,
+            "name": self.name,
+            "credit": self.credit
+        }
+
+
     @staticmethod
     def find_by_id(id, db):
         return db.query(AgentUser).filter(AgentUser.id == id).first()
