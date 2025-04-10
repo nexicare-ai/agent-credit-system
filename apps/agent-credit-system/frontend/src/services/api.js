@@ -886,6 +886,17 @@ export const agentUserService = {
     }
   },
 
+  // Create a new agent user
+  createAgentUser: async (userData) => {
+    try {
+      const response = await api.post('/api/agents/users', userData);
+      return response.data;
+    } catch (error) {
+      console.error('Error creating agent user:', error);
+      throw error;
+    }
+  },
+
   // Get an agent user by ID
   getAgentUserById: async (userId) => {
     try {
@@ -893,6 +904,28 @@ export const agentUserService = {
       return response.data;
     } catch (error) {
       console.error(`Error fetching agent user ${userId}:`, error);
+      throw error;
+    }
+  },
+
+  // Get an agent user by mobile
+  getAgentUserByMobile: async (mobile) => {
+    try {
+      const response = await api.get(`/api/agents/users/${mobile}`);
+      return response.data;
+    } catch (error) {
+      console.error(`Error fetching agent user with mobile ${mobile}:`, error);
+      throw error;
+    }
+  },
+
+  // Update an agent user
+  updateAgentUser: async (mobile, userData) => {
+    try {
+      const response = await api.put(`/api/agents/users/${mobile}`, userData);
+      return response.data;
+    } catch (error) {
+      console.error(`Error updating agent user with mobile ${mobile}:`, error);
       throw error;
     }
   },

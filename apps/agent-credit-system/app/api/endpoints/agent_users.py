@@ -32,8 +32,8 @@ async def create_agent_user(
             detail="Mobile number already registered"
         )
 
-    # Check if email already exists
-    if AgentUser.find_by_email(user_data.email, db):
+    # Check if email already exists (only if email is provided)
+    if user_data.email and AgentUser.find_by_email(user_data.email, db):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Email already registered"
@@ -111,7 +111,7 @@ async def update_agent_user(
             detail="User not found"
         )
 
-    # If updating email, check if it's not already taken
+    # If updating email, check if it's not already taken (only if email is provided)
     if user_update.email and user_update.email != user.email:
         existing_user = AgentUser.find_by_email(user_update.email, db)
         if existing_user:

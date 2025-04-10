@@ -26,6 +26,5 @@ langchain-core==0.3.37
 langchain-openai==0.3.6
 langchain-text-splitters==0.3.6
 twilio==9.3.7
-pydantic==2.6.4
 email-validator==2.2.0
 phonenumbers==8.13.32

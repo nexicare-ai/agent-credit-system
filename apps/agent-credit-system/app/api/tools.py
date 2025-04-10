@@ -36,6 +36,12 @@ class StandardResponse(BaseModel):
     data: Optional[Dict[str, Any]] = None
     message: Optional[str] = None
 
+class ApplyConsumableRequest(BaseModel):
+    consumable_id: str
+    agent_user_id: str
+    count: int = 1
+    description: Optional[str] = None
+
 # Tool endpoints
 
 @router.get("/list_purchasables", response_model=StandardResponse)
@@ -66,6 +72,31 @@ async def list_consumables(
         "success": True,
         "data": {"consumables": [c.to_dict() for c in consumables], "total": total},
         "message": "Consumables retrieved successfully"
+    }
+
+@router.post('/apply_appointment_consumable', response_model=StandardResponse)
+async def apply_appointment_consumable(
+    request: Request,
+    db: Session = Depends(get_nexi_db)
+):
+    """
+    Apply consumables to a user by mobile number
+    """
+    body = await request.json()
+    data = ApplyConsumableRequest(**body)
+
+    Consumable.apply_consumable(
+        consumable_id=data.consumable_id,
+        user_id=data.agent_user_id,
+        count=data.count,
+        description=data.description,
+        current_user=None,
+        db=db
+    )
+    return {
+        "success": True,
+        "data": {},
+        "message": "User credit consumed successfully"
     }
 
 @router.post("/create_purchase_request", response_model=StandardResponse)
@@ -152,7 +183,7 @@ async def register_agent_user(
         }
 
     # Check if email already exists
-    if AgentUser.find_by_email(body["email"], db):
+    if body.get("email", None) and AgentUser.find_by_email(body["email"], db):
         return {
             "success": False,
             "message": "Email already registered"
@@ -162,7 +193,7 @@ async def register_agent_user(
     user_data = AgentUserCreate(
         name=body["name"],
         mobile=body["mobile"],
-        email=body["email"],
+        email=body.get("email", None),
         credit=Decimal(0)
     )
 

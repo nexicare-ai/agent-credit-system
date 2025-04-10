@@ -57,7 +57,3 @@ CREATE TABLE agent_event (
 CREATE INDEX idx_agent_event_target_id ON agent_event (target_id);
 CREATE INDEX idx_agent_event_event_type ON agent_event (event_type);
 CREATE INDEX idx_agent_event_timestamp ON agent_event (timestamp);
-
--- Add comment to mark completion
-COMMENT ON DATABASE CURRENT_DATABASE() IS 'Agent Credit System schema initialized at '
-  || NOW()::TEXT || ' with consolidated migration 1744178801722-agent_schema_consolidated.sql';

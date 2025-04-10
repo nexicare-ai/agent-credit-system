@@ -6,7 +6,7 @@ from datetime import datetime
 # Agent User Models
 class AgentUserBase(BaseModel):
     mobile: str
-    email: EmailStr
+    email: Optional[EmailStr] = None
     name: str
 
 class AgentUserCreate(AgentUserBase):

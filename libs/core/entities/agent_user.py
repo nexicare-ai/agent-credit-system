@@ -10,7 +10,7 @@ class AgentUser(Base):
 
     id = Column(String, primary_key=True, default=lambda: str(uuid.uuid4()))
     mobile = Column(String, unique=True, nullable=False)
-    email = Column(String, unique=True, nullable=False)
+    email = Column(String, unique=True, nullable=True)
     name = Column(String, nullable=False)
     credit = Column(Numeric(18, 2), nullable=False, default=0.00)
     created_at = Column(DateTime, default=datetime.now)

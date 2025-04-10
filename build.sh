@@ -1,0 +1,1 @@
+docker buildx build --platform linux/amd64 -t gcr.io/flowise-staging/acrm:latest --push -f .infra/docker/Dockerfile.acrm .
