@@ -2,8 +2,14 @@ from libs.core.entities.agent_event import AgentEvent
 from libs.core.entities.agent_user import AgentUser
 from decimal import Decimal
 
-def refund_appointment(appointment_id, user_id, db):
+def refund_appointment(appointment_id, user_id, db, dry_run=False):
     appointment = AgentEvent.find_by_appointment_id(appointment_id, db)
+
+    if dry_run:
+        return {
+            "success": True,
+            "message": "Dry run successful"
+        }
 
     if not appointment:
         raise ValueError("Appointment not found")

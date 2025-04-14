@@ -47,6 +47,7 @@ class ApplyConsumableRequest(BaseModel):
 class RefundConsumableRequest(BaseModel):
     agent_user_id: str
     appointment_id: str = None
+    dry_run: bool = False
 
 @router.get("/list_purchasables", response_model=StandardResponse)
 async def list_purchasables(
@@ -110,7 +111,6 @@ async def apply_appointment_consumable(
             "message": str(e)
         }
 
-
 @router.post('/refund_appointment', response_model=StandardResponse)
 async def refund_appointment_consumable(
     request: Request,
@@ -126,7 +126,8 @@ async def refund_appointment_consumable(
         refund_service.refund_appointment(
             appointment_id=data.appointment_id,
             user_id=data.agent_user_id,
-            db=db
+            db=db,
+            dry_run=data.dry_run
         )
 
         return {
