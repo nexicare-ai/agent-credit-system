@@ -19,10 +19,10 @@ def refund_appointment(appointment_id, user_id, db, dry_run=False):
         }
 
     single_amount = Decimal(appointment.event_data['amount'])
-    amount = single_amount * Decimal(appointment.event_data['count'])
+    amount = single_amount * Decimal(appointment.event_data['count']) * -1
 
     previous_balance = user.credit
-    new_balance = previous_balance - amount
+    new_balance = previous_balance + amount
 
     # Update user's credit balance
     user.credit = new_balance
