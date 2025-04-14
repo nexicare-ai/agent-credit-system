@@ -12,6 +12,7 @@ from libs.core.database import get_nexi_db
 from libs.core.entities.agent_user import AgentUser
 from libs.core.entities.purchasable import Purchasable
 from libs.core.entities.consumable import Consumable
+import app.services.refund_service as refund_service
 
 router = APIRouter()
 
@@ -40,9 +41,12 @@ class ApplyConsumableRequest(BaseModel):
     consumable_id: str
     agent_user_id: str
     count: int = 1
+    appointment_id: Optional[str] = None
     description: Optional[str] = None
 
-# Tool endpoints
+class RefundConsumableRequest(BaseModel):
+    agent_user_id: str
+    appointment_id: str = None
 
 @router.get("/list_purchasables", response_model=StandardResponse)
 async def list_purchasables(
@@ -82,22 +86,59 @@ async def apply_appointment_consumable(
     """
     Apply consumables to a user by mobile number
     """
-    body = await request.json()
-    data = ApplyConsumableRequest(**body)
+    try:
+        body = await request.json()
+        data = ApplyConsumableRequest(**body)
 
-    Consumable.apply_consumable(
-        consumable_id=data.consumable_id,
-        user_id=data.agent_user_id,
-        count=data.count,
-        description=data.description,
-        current_user=None,
-        db=db
-    )
-    return {
-        "success": True,
-        "data": {},
-        "message": "User credit consumed successfully"
-    }
+        Consumable.apply_consumable(
+            consumable_id=data.consumable_id,
+            user_id=data.agent_user_id,
+            count=data.count,
+            description=data.description,
+            appointment_id=data.appointment_id,
+            current_user=None,
+            db=db
+        )
+        return {
+            "success": True,
+            "data": {},
+            "message": "User credit consumed successfully"
+        }
+    except Exception as e:
+        return {
+            "success": False,
+            "message": str(e)
+        }
+
+
+@router.post('/refund_appointment', response_model=StandardResponse)
+async def refund_appointment_consumable(
+    request: Request,
+    db: Session = Depends(get_nexi_db)
+):
+    """
+    Refund consumables from a user by mobile number
+    """
+    try:
+        body = await request.json()
+        data = RefundConsumableRequest(**body)
+
+        refund_service.refund_appointment(
+            appointment_id=data.appointment_id,
+            user_id=data.agent_user_id,
+            db=db
+        )
+
+        return {
+            "success": True,
+            "data": {},
+            "message": "User credit refunded successfully"
+        }
+    except Exception as e:
+        return {
+            "success": False,
+            "message": str(e)
+        }
 
 @router.post("/create_purchase_request", response_model=StandardResponse)
 async def create_purchase_request(

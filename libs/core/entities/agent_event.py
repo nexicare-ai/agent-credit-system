@@ -27,9 +27,10 @@ class AgentEvent(Base):
         self.created_by = created_by
 
     @staticmethod
-    def create_credit_event(target_id, amount, previous_balance, new_balance, consumable_name=None, count=None, purchasable_name=None, description=None, created_by=None, db=None):
+    def create_credit_event(target_id, amount, previous_balance, new_balance, consumable_name=None, count=None, purchasable_name=None, appointment_id=None, description=None, created_by=None, db=None):
         """Create a credit related event for an agent user"""
         event_data = {
+            "type": "default",
             "amount": str(amount),
             "previous_balance": str(previous_balance),
             "new_balance": str(new_balance),
@@ -41,6 +42,8 @@ class AgentEvent(Base):
             event_data["purchasable_name"] = purchasable_name
         if count:
             event_data["count"] = count
+        if appointment_id:
+            event_data["appointment_id"] = appointment_id
 
         event = AgentEvent(
             event_type="agent_credit",
@@ -55,6 +58,35 @@ class AgentEvent(Base):
             db.commit()
 
         return event
+
+    @staticmethod
+    def create_refund_event(target_id, amount, previous_balance, new_balance, refund_event_id, appointment_id=None, description=None, created_by=None, db=None):
+        """Create a refund related event for an agent user"""
+        event_data = {
+            "type": "refund",
+            "amount": str(amount),
+            "previous_balance": str(previous_balance),
+            "new_balance": str(new_balance),
+            "refund_event_id": str(refund_event_id),
+        }
+
+        if appointment_id:
+            event_data["appointment_id"] = appointment_id
+
+        event = AgentEvent(
+            event_type="agent_credit",
+            target_id=target_id,
+            event_data=event_data,
+            description=description,
+            created_by=created_by
+        )
+
+        if db:
+            db.add(event)
+            db.commit()
+
+        return event
+
 
     @staticmethod
     def get_all_events(db, skip=0, limit=100):
@@ -72,6 +104,26 @@ class AgentEvent(Base):
         return db.query(AgentEvent).filter(AgentEvent.target_id == target_id)\
             .order_by(AgentEvent.timestamp.desc())\
             .offset(skip).limit(limit).all()
+
+    @staticmethod
+    def find_by_appointment_id(appointment_id, db):
+        event = db.query(AgentEvent).filter(
+            AgentEvent.event_data['appointment_id'].astext.cast(String) == appointment_id,
+            AgentEvent.event_data['type'].astext.cast(String) == 'default'
+        ).first()
+
+        if not event:
+            return None
+
+        refund_event = db.query(AgentEvent).filter(
+            AgentEvent.event_data['refund_event_id'].astext.cast(String) == event.id,
+            AgentEvent.event_data['type'].astext.cast(String) == 'refund'
+        ).first()
+
+        if refund_event:
+            return None
+
+        return event
 
     @staticmethod
     def count_target_events(target_id, db):

@@ -47,7 +47,7 @@ class Consumable(Base):
         return db.query(Consumable).order_by(Consumable.name).offset(skip).limit(limit).all()
 
     @staticmethod
-    def apply_consumable(consumable_id, user_id, count, description, current_user, db):
+    def apply_consumable(consumable_id, user_id, count, description, current_user, db, appointment_id=None):
         try:
             consumable = Consumable.find_by_id(consumable_id, db)
             if not consumable:
@@ -64,7 +64,7 @@ class Consumable(Base):
             new_balance = previous_balance + amount
 
             if new_balance < 0:
-                raise ValueError("User doesn't have enough credit")
+                raise ValueError(f"User doesn't have enough credit, current credit: {previous_balance}")
 
             # Update user credit
             user.credit = new_balance
@@ -82,6 +82,7 @@ class Consumable(Base):
                 consumable_name=consumable.name,
                 count=count,
                 description=description,
+                appointment_id=appointment_id,
                 created_by=created_by,
                 db=db
             )
