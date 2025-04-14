@@ -5,18 +5,18 @@ from decimal import Decimal
 def refund_appointment(appointment_id, user_id, db, dry_run=False):
     appointment = AgentEvent.find_by_appointment_id(appointment_id, db)
 
-    if dry_run:
-        return {
-            "success": True,
-            "message": "Dry run successful"
-        }
-
     if not appointment:
         raise ValueError("Appointment not found")
 
     user = AgentUser.find_by_id(user_id, db)
     if not user:
         raise ValueError("User not found")
+
+    if dry_run:
+        return {
+            "success": True,
+            "message": "Dry run successful"
+        }
 
     single_amount = Decimal(appointment.event_data['amount'])
     amount = single_amount * Decimal(appointment.event_data['count'])
